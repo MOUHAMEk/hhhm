@@ -1065,7 +1065,10 @@ Promise.all(imagePromises).then(() => {
 
 
 // Ajouter la fonctionnalité pour envoyer et prévisualiser le PDF
-document.getElementById('sendPdfButton').addEventListener('click', () => {
+document.getElementById('sendPdfButton').addEventListener('click', (event) => {
+    // Empêcher le comportement par défaut du bouton (qui peut fermer l'application ou rediriger)
+    event.preventDefault();
+
     if (generatedPdfBlob) {
         const url = URL.createObjectURL(generatedPdfBlob);
 
