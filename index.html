@@ -406,9 +406,8 @@ textarea:focus {
 <div id="pdfPreview" style="display: none;">
     <div id="pdfImages"></div> <!-- Conteneur où les images du PDF seront affichées -->
 </div>
-<div id="pdfSection">
-    <iframe id="pdfIframe" style="width: 100%; height: 500px; border: none;"></iframe>
-</div> <!-- Cette section contient déjà l'iframe pour le PDF -->
+<div id="pdfSection"></div> <!-- Cette section recevra l'iframe avec le PDF -->
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 
@@ -1066,24 +1065,44 @@ Promise.all(imagePromises).then(() => {
 
 
 // Ajouter la fonctionnalité pour envoyer et prévisualiser le PDF
-document.getElementById('sendPdfButton').addEventListener('click', (event) => {
-    // Empêcher le comportement par défaut du bouton (qui peut fermer l'application ou rediriger)
-    event.preventDefault();
-
+document.getElementById('sendPdfButton').addEventListener('click', () => {
     if (generatedPdfBlob) {
         const url = URL.createObjectURL(generatedPdfBlob);
-        
-        // Mettre à jour la source de l'iframe statique
-        const iframe = document.getElementById('pdfIframe');
-        iframe.src = url; // Définir la source de l'iframe avec le PDF généré
-        
-        // Garder l'URL active pour la prévisualisation (pas de revoke ici)
+
+        // Vérifier si l'iframe existe déjà, sinon la créer
+        let pdfPreview = document.getElementById('pdfPreview');
+        if (!pdfPreview) {
+            pdfPreview = document.createElement('iframe');
+            pdfPreview.id = 'pdfPreview';
+            pdfPreview.style.width = '100%';
+            pdfPreview.style.height = '600px';
+            pdfPreview.style.border = '2px solid #ccc';
+            document.body.appendChild(pdfPreview); // Ajouter l'iframe à la fin du body
+        }
+
+        // Afficher le PDF dans l'iframe
+        pdfPreview.src = url;
+
+        // Obtenir la date actuelle formatée
+        const today = new Date();
+        const formattedDate = today.toLocaleDateString('fr-FR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).replace(/\//g, '-');  // Remplacer les "/" par des "-"
+
+        // Télécharger le fichier PDF
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `PV_du_${formattedDate}.pdf`; // Nom du fichier
+        a.click();
+
+        // Libérer l'URL après l'utilisation
+        URL.revokeObjectURL(url); 
     } else {
-        alert('Aucun PDF à prévisualiser. Veuillez d\'abord générer le PDF.');
+        alert('Aucun PDF à télécharger. Veuillez d\'abord générer le PDF.');
     }
 });
-
-
 
 
 
