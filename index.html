@@ -406,8 +406,9 @@ textarea:focus {
 <div id="pdfPreview" style="display: none;">
     <div id="pdfImages"></div> <!-- Conteneur où les images du PDF seront affichées -->
 </div>
-<div id="pdfSection"></div> <!-- Cette section recevra l'iframe avec le PDF -->
-
+<div id="pdfSection">
+    <iframe id="pdfIframe" style="width: 100%; height: 500px; border: none;"></iframe>
+</div> <!-- Cette section contient déjà l'iframe pour le PDF -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 
@@ -1071,31 +1072,17 @@ document.getElementById('sendPdfButton').addEventListener('click', (event) => {
 
     if (generatedPdfBlob) {
         const url = URL.createObjectURL(generatedPdfBlob);
-
-        // Créer ou récupérer l'iframe dans la page
-        let existingIframe = document.getElementById('pdfIframe');
-        if (!existingIframe) {
-            // Créer un nouvel iframe si nécessaire
-            const iframe = document.createElement('iframe');
-            iframe.id = 'pdfIframe';
-            iframe.style.width = '100%';
-            iframe.style.height = '500px';
-            iframe.style.border = 'none';
-            
-            // Ajouter l'iframe à une section spécifique dans la page HTML
-            document.getElementById('pdfSection').appendChild(iframe);
-            existingIframe = iframe;  // Assigner la nouvelle iframe à la variable
-        }
-
-        // Définir la source de l'iframe avec le PDF généré
-        existingIframe.src = url;
-
-        // Empêcher le téléchargement immédiat
-        // URL.revokeObjectURL(url); // Facultatif : Utiliser cette ligne plus tard si nécessaire pour libérer l'URL
+        
+        // Mettre à jour la source de l'iframe statique
+        const iframe = document.getElementById('pdfIframe');
+        iframe.src = url; // Définir la source de l'iframe avec le PDF généré
+        
+        // Garder l'URL active pour la prévisualisation (pas de revoke ici)
     } else {
         alert('Aucun PDF à prévisualiser. Veuillez d\'abord générer le PDF.');
     }
 });
+
 
 
 
