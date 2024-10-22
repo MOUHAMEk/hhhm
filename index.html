@@ -406,6 +406,7 @@ textarea:focus {
 <div id="pdfPreview" style="display: none;">
     <div id="pdfImages"></div> <!-- Conteneur où les images du PDF seront affichées -->
 </div>
+<div id="pdfSection"></div> <!-- Cette section recevra l'iframe avec le PDF -->
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
@@ -1068,47 +1069,26 @@ document.getElementById('sendPdfButton').addEventListener('click', () => {
     if (generatedPdfBlob) {
         const url = URL.createObjectURL(generatedPdfBlob);
 
-        // Créer le modal si ce n'est pas déjà fait
-        let existingModal = document.getElementById('pdfModal');
-        if (!existingModal) {
-            // Créer la structure du modal
-            const modal = document.createElement('div');
-            modal.id = 'pdfModal';
-            modal.style.position = 'fixed';
-            modal.style.top = '0';
-            modal.style.left = '0';
-            modal.style.width = '100%';
-            modal.style.height = '100%';
-            modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-            modal.style.display = 'flex';
-            modal.style.alignItems = 'center';
-            modal.style.justifyContent = 'center';
-            modal.style.zIndex = '1000';
-
-            // Créer le conteneur de l'aperçu PDF dans un iframe
-            const modalContent = document.createElement('div');
-            modalContent.style.position = 'relative';
-            modalContent.style.width = '80%';
-            modalContent.style.height = '80%';
-            modalContent.style.backgroundColor = 'white';
-            modalContent.style.padding = '20px';
-            modalContent.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-
-            // Créer l'iframe qui contiendra le PDF
-            const pdfIframe = document.createElement('iframe');
-            pdfIframe.src = url;
-            pdfIframe.style.width = '100%';
-            pdfIframe.style.height = '100%';
-            pdfIframe.style.border = 'none';
-
-            // Ajouter l'iframe au contenu du modal
-            modalContent.appendChild(pdfIframe);
-            modal.appendChild(modalContent);
-            document.body.appendChild(modal); // Ajouter le modal à la page
+        // Créer ou récupérer l'iframe dans la page
+        let existingIframe = document.getElementById('pdfIframe');
+        if (!existingIframe) {
+            // Créer un nouvel iframe si nécessaire
+            const iframe = document.createElement('iframe');
+            iframe.id = 'pdfIframe';
+            iframe.style.width = '100%';
+            iframe.style.height = '500px';
+            iframe.style.border = 'none';
+            
+            // Ajouter l'iframe à une section spécifique dans la page HTML
+            document.getElementById('pdfSection').appendChild(iframe);
+            existingIframe = iframe;  // Assigner la nouvelle iframe à la variable
         }
 
-        // Libérer l'URL après utilisation (facultatif ici)
-        // URL.revokeObjectURL(url); 
+        // Définir la source de l'iframe avec le PDF généré
+        existingIframe.src = url;
+
+        // Empêcher le téléchargement immédiat
+        // URL.revokeObjectURL(url); // Facultatif : Utiliser cette ligne plus tard si nécessaire pour libérer l'URL
     } else {
         alert('Aucun PDF à prévisualiser. Veuillez d\'abord générer le PDF.');
     }
